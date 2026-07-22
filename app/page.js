@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const HERO_TEXT = "Assalomu alaykum!";
 const WEDDING_DATE = new Date("2026-08-16T16:00:00");
@@ -23,7 +23,25 @@ function getCountdown() {
 export default function Page() {
   const [open, setOpen] = useState(false);
   const [introHidden, setIntroHidden] = useState(false);
+  const [muted, setMuted] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: "00", mins: "00", secs: "00" });
+  const audioRef = useRef(null);
+
+  function handleOpen() {
+    setOpen(true);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = 0.5;
+      audio.play().catch(() => {});
+    }
+  }
+
+  function toggleMute() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = !audio.muted;
+    setMuted(audio.muted);
+  }
 
   useEffect(() => {
     setCountdown(getCountdown());
@@ -33,10 +51,24 @@ export default function Page() {
 
   return (
     <>
+      <audio ref={audioRef} src="/music.mp3" loop preload="auto" />
+
+      {open && (
+        <button
+          className="mute-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleMute();
+          }}
+        >
+          {muted ? "🔇" : "🔊"}
+        </button>
+      )}
+
       <section
         id="intro"
         className={open ? "open" : ""}
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         onTransitionEnd={() => open && setIntroHidden(true)}
         style={{ display: introHidden ? "none" : "flex" }}
       >
@@ -479,6 +511,20 @@ export default function Page() {
           letter-spacing: 3px;
           color: var(--gold-dark);
           animation: pulse 1.8s infinite;
+        }
+        .mute-btn {
+          position: fixed;
+          top: 16px;
+          right: 16px;
+          z-index: 50;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 1px solid rgba(201, 167, 82, 0.4);
+          background: var(--cream-2);
+          font-size: 16px;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(44, 31, 20, 0.1);
         }
         @keyframes pulse {
           0%,
