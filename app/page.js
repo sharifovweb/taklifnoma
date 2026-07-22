@@ -51,7 +51,7 @@ export default function Page() {
 
   return (
     <>
-      <audio ref={audioRef} src="/music.mp3" loop preload="auto" />
+      <audio ref={audioRef} src="/music.m4a" loop preload="auto" />
 
       {open && (
         <button
